@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShopEasy – Premium Store</title>
+
+  <!-- Google Fonts: Playfair Display (display) + DM Sans (body) -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* =========================================================
+       CSS CUSTOM PROPERTIES (Design Tokens)
+    ========================================================= */
+    :root {
+      --bg:        #0d0d0d;
+      --surface:   #161616;
+      --card:      #1c1c1c;
+      --border:    #2a2a2a;
+      --accent:    #e8c97a;       /* warm gold */
+      --accent2:   #c4f135;       /* electric lime – hover spark */
+      --text:      #f0ede6;
+      --muted:     #7a7a7a;
+      --danger:    #ff5e5e;
+      --radius:    18px;
+      --font-head: 'Playfair Display', serif;
+      --font-body: 'DM Sans', sans-serif;
+      --transition: 0.35s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* =========================================================
+       RESET & BASE
+    ========================================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* =========================================================
+       NAVBAR
+    ========================================================= */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(13,13,13,0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--font-head);
+      font-size: 1.6rem;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+      cursor: pointer;
+    }
+
+    .nav-logo span { color: var(--text); }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links li a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: color var(--transition);
+    }
+
+    .nav-links li a:hover { color: var(--accent); }
+
+    .nav-cart {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition);
+    }
+
+    .nav-cart:hover { background: var(--accent2); transform: scale(1.05); }
+
+    /* =========================================================
+       PAGE SECTIONS  (show/hide via JS)
+    ========================================================= */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* =========================================================
+       HOMEPAGE — HERO
+    ========================================================= */
+    .hero {
+      text-align: center;
+      padding: 5rem 1rem 3rem;
+      position: relative;
+    }
+
+    /* Decorative background blob */
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,201,122,0.12) 0%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -60%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      background: rgba(232,201,122,0.12);
+      color: var(--accent);
+      border: 1px solid rgba(232,201,122,0.3);
+      padding: 0.3rem 1rem;
+      border-radius: 50px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+
+    .hero h1 {
+      font-family: var(--font-head);
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      line-height: 1.1;
+      max-width: 700px;
+      margin: 0 auto 1.2rem;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 480px;
+      margin: 0 auto 2rem;
+      font-weight: 300;
+    }
+
+    /* =========================================================
+       PRODUCTS GRID
+    ========================================================= */
+    .section-label {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 2.5rem;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.8rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem 5rem;
+    }
+
+    /* Product Card */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+      position: relative;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      border-color: var(--accent);
+      box-shadow: 0 20px 50px rgba(232,201,122,0.12);
+    }
+
+    /* Gold top bar on hover */
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform: scaleX(0);
+      transition: transform var(--transition);
+      transform-origin: left;
+    }
+
+    .card:hover::after { transform: scaleX(1); }
+
+    /* Product image container */
+    .card-img {
+      width: 100%;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      font-size: 6rem;
+      position: relative;
+      overflow: hidden;
+      transition: background var(--transition);
+    }
+
+    .card:hover .card-img { background: #202020; }
+
+    /* Subtle icon scale on hover */
+    .card-img .emoji {
+      display: inline-block;
+      transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+      filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4));
+    }
+
+    .card:hover .card-img .emoji { transform: scale(1.18); }
+
+    /* Badge */
+    .card-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--accent);
+      color: #000;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+
+    .card-body { padding: 1.4rem 1.5rem 1.6rem; }
+
+    .card-name {
+      font-family: var(--font-head);
+      font-size: 1.25rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-category {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.9rem;
+    }
+
+    .card-price {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+    }
+
+    .card-price span {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 400;
+      text-decoration: line-through;
+      margin-left: 0.4rem;
+    }
+
+    /* View Details Button */
+    .btn-view {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), transform 0.15s;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-view:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-view:active { transform: scale(0.97); }
+
+    /* =========================================================
+       DETAIL PAGE
+    ========================================================= */
+    .detail-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    /* Back button */
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.5rem 1.1rem;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-bottom: 2.5rem;
+      transition: border-color var(--transition), color var(--transition);
+    }
+
+    .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    @media (max-width: 700px) {
+      .detail-grid { grid-template-columns: 1fr; gap: 2rem; }
+    }
+
+    .detail-img-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      height: 360px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9rem;
+      filter: drop-shadow(0 8px 32px rgba(0,0,0,0.5));
+    }
+
+    .detail-info {}
+
+    .detail-tag {
+      display: inline-block;
+      background: rgba(232,201,122,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(232,201,122,0.25);
+      padding: 0.25rem 0.8rem;
+      border-radius: 50px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .detail-name {
+      font-family: var(--font-head);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      line-height: 1.15;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-price {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .detail-old-price {
+      font-size: 0.95rem;
+      color: var(--muted);
+      text-decoration: line-through;
+      margin-bottom: 1.6rem;
+    }
+
+    .detail-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.6rem 0;
+    }
+
+    .detail-desc-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .detail-desc {
+      font-size: 0.97rem;
+      color: #bbb;
+      line-height: 1.75;
+      font-weight: 300;
+      margin-bottom: 1.8rem;
+    }
+
+    /* Feature pills */
+    .detail-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 2rem;
+    }
+
+    .feature-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    /* Buy Now button */
+    .btn-buy {
+      width: 100%;
+      padding: 1rem;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: background var(--transition), transform 0.15s, box-shadow var(--transition);
+    }
+
+    .btn-buy:hover {
+      background: var(--accent2);
+      box-shadow: 0 6px 24px rgba(196,241,53,0.25);
+    }
+
+    .btn-buy:active { transform: scale(0.98); }
+
+    /* Click ripple animation */
+    @keyframes ripple {
+      0%   { opacity: 0.4; transform: scale(0); }
+      100% { opacity: 0;   transform: scale(4); }
+    }
+
+    .ripple-container { position: relative; overflow: hidden; }
+
+    .ripple-effect {
+      position: absolute;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      background: rgba(255,255,255,0.35);
+      transform: scale(0);
+      pointer-events: none;
+      animation: ripple 0.55s ease-out forwards;
+    }
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 1.8rem 1rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* =========================================================
+       TOAST NOTIFICATION
+    ========================================================= */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--accent);
+      color: #000;
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      z-index: 999;
+      transition: transform 0.4s cubic-bezier(.34,1.56,.64,1), opacity 0.4s;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* =========================================================
+       PAGE TRANSITION
+    ========================================================= */
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .page.active { animation: fadeSlideIn 0.45s ease forwards; }
+
+    /* =========================================================
+       RESPONSIVE NAVBAR
+    ========================================================= */
+    @media (max-width: 600px) {
+      nav { padding: 0.9rem 1.2rem; }
+      .nav-links { display: none; }   /* simplified for mobile */
+      .products-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav>
+    <div class="nav-logo" onclick="showPage('home')">Shop<span>Easy</span></div>
+    <ul class="nav-links">
+      <li><a href="#" onclick="showPage('home')">Home</a></li>
+      <li><a href="#">Categories</a></li>
+      <li><a href="#">Offers</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+    <button class="nav-cart" onclick="showToast('🛒 Cart is empty!')">Cart (0)</button>
+  </nav>
+
+  <!-- ===================== HOME PAGE ===================== -->
+  <section id="page-home" class="page active">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-tag">✦ New Arrivals 2025</div>
+      <h1>Shop the <em>Future,</em><br/>Delivered Today</h1>
+      <p>Explore premium gadgets, fashion & lifestyle products — all in one place.</p>
+    </div>
+
+    <!-- Products -->
+    <p class="section-label">— Our Products —</p>
+
+    <div class="products-grid">
+
+      <!-- Card: Phone -->
+      <div class="card" onclick="showDetail('phone')">
+        <div class="card-img">
+          <span class="emoji">📱</span>
+          <div class="card-badge">Hot</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Smart Phone</div>
+          <div class="card-category">Electronics</div>
+          <div class="card-price">₹50,000 <span>₹62,000</span></div>
+          <button class="btn-view ripple-container" onclick="handleBtn(event,'phone')">View Details →</button>
+        </div>
+      </div>
+
+      <!-- Card: Clothes -->
+      <div class="card" onclick="showDetail('clothes')">
+        <div class="card-img">
+          <span class="emoji">👕</span>
+          <div class="card-badge">Trending</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Designer Clothes</div>
+          <div class="card-category">Fashion</div>
+          <div class="card-price">₹2,000 <span>₹3,200</span></div>
+          <button class="btn-view ripple-container" onclick="handleBtn(event,'clothes')">View Details →</button>
+        </div>
+      </div>
+
+      <!-- Card: TV -->
+      <div class="card" onclick="showDetail('tv')">
+        <div class="card-img">
+          <span class="emoji">📺</span>
+          <div class="card-badge">Sale</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Smart TV 4K</div>
+          <div class="card-category">Electronics</div>
+          <div class="card-price">₹40,000 <span>₹55,000</span></div>
+          <button class="btn-view ripple-container" onclick="handleBtn(event,'tv')">View Details →</button>
+        </div>
+      </div>
+
+      <!-- Card: Watches -->
+      <div class="card" onclick="showDetail('watch')">
+        <div class="card-img">
+          <span class="emoji">⌚</span>
+          <div class="card-badge">Premium</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">Luxury Watch</div>
+          <div class="card-category">Accessories</div>
+          <div class="card-price">₹5,000 <span>₹7,500</span></div>
+          <button class="btn-view ripple-container" onclick="handleBtn(event,'watch')">View Details →</button>
+        </div>
+      </div>
+
+    </div><!-- /products-grid -->
+  </section>
+
+  <!-- ===================== DETAIL PAGE (shared, filled by JS) ===================== -->
+  <section id="page-detail" class="page">
+    <div class="detail-container">
+
+      <!-- Back button -->
+      <button class="btn-back" onclick="showPage('home')">← Back to Home</button>
+
+      <div class="detail-grid">
+
+        <!-- Image -->
+        <div class="detail-img-box" id="detail-img"></div>
+
+        <!-- Info -->
+        <div class="detail-info">
+          <div class="detail-tag" id="detail-tag"></div>
+          <h2 class="detail-name" id="detail-name"></h2>
+          <div class="detail-price" id="detail-price"></div>
+          <div class="detail-old-price" id="detail-old"></div>
+
+          <div class="detail-divider"></div>
+
+          <div class="detail-desc-label">Description</div>
+          <p class="detail-desc" id="detail-desc"></p>
+
+          <div class="detail-features" id="detail-features"></div>
+
+          <button class="btn-buy ripple-container" onclick="handleBuy(event)">
+            🛒 Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer>
+    © 2025 ShopEasy. Made with ❤️ in India.
+  </footer>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ===================== JAVASCRIPT ===================== -->
+  <script>
+    // -------------------------------------------------------
+    // PRODUCT DATA  — add or edit products here!
+    // -------------------------------------------------------
+    const products = {
+      phone: {
+        emoji:    '📱',
+        tag:      'Electronics',
+        name:     'Smart Phone',
+        price:    '₹50,000',
+        oldPrice: '₹62,000',
+        desc:     'Experience next-level performance with our flagship smartphone. ' +
+                  'Featuring a stunning 6.7" AMOLED display, a 200MP triple-camera system, ' +
+                  '5G connectivity, and a 5000mAh battery that lasts all day. ' +
+                  'Powered by the latest 8-core processor, it handles everything from gaming to multitasking with ease.',
+        features: ['6.7" AMOLED', '200MP Camera', '5G Ready', '5000mAh', '8 Core CPU', '256 GB Storage']
+      },
+      clothes: {
+        emoji:    '👕',
+        tag:      'Fashion',
+        name:     'Designer Clothes',
+        price:    '₹2,000',
+        oldPrice: '₹3,200',
+        desc:     'Elevate your everyday wardrobe with our premium designer collection. ' +
+                  'Crafted from 100% organic cotton with breathable fabric, each piece is designed to look sharp ' +
+                  'whether you\'re at work or out on the weekend. Available in all sizes and a range of seasonal colours.',
+        features: ['100% Organic Cotton', 'All Sizes', 'Machine Washable', 'Unisex Fit', 'Eco-Friendly']
+      },
+      tv: {
+        emoji:    '📺',
+        tag:      'Electronics',
+        name:     'Smart TV 4K',
+        price:    '₹40,000',
+        oldPrice: '₹55,000',
+        desc:     'Transform your living room into a cinema with our 55" 4K Smart TV. ' +
+                  'Dolby Vision HDR and Dolby Atmos audio deliver a truly immersive experience. ' +
+                  'Built-in Android TV gives you access to thousands of apps, and the ultra-thin bezel design ' +
+                  'ensures maximum screen real estate.',
+        features: ['55" 4K UHD', 'Dolby Vision', 'Dolby Atmos', 'Android TV', '4×HDMI', 'Voice Remote']
+      },
+      watch: {
+        emoji:    '⌚',
+        tag:      'Accessories',
+        name:     'Luxury Watch',
+        price:    '₹5,000',
+        oldPrice: '₹7,500',
+        desc:     'Make a statement on every wrist with our precision-crafted luxury timepiece. ' +
+                  'Swiss quartz movement inside a stainless-steel case with a genuine leather strap. ' +
+                  'Water-resistant up to 50m and scratch-resistant sapphire glass make it as durable as it is elegant.',
+        features: ['Swiss Quartz', 'Sapphire Glass', 'Water-Resistant', 'Leather Strap', 'Date Window', '2-yr Warranty']
+      }
+    };
+
+    // -------------------------------------------------------
+    // PAGE NAVIGATION — shows/hides sections
+    // -------------------------------------------------------
+    function showPage(pageId) {
+      // Remove 'active' from all pages
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      // Add 'active' to the target page
+      document.getElementById('page-' + pageId).classList.add('active');
+      // Scroll to top smoothly
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // -------------------------------------------------------
+    // PRODUCT DETAIL — fills the detail page with product data
+    // -------------------------------------------------------
+    function showDetail(productId) {
+      const p = products[productId]; // get product object
+      if (!p) return;
+
+      // Fill in each field
+      document.getElementById('detail-img').innerHTML   = p.emoji;
+      document.getElementById('detail-tag').textContent = p.tag;
+      document.getElementById('detail-name').textContent= p.name;
+      document.getElementById('detail-price').textContent = p.price;
+      document.getElementById('detail-old').textContent = 'MRP ' + p.oldPrice;
+      document.getElementById('detail-desc').textContent= p.desc;
+
+      // Build feature pills
+      const featEl = document.getElementById('detail-features');
+      featEl.innerHTML = '';
+      p.features.forEach(f => {
+        const pill = document.createElement('span');
+        pill.className   = 'feature-pill';
+        pill.textContent = f;
+        featEl.appendChild(pill);
+      });
+
+      // Store current product id for the Buy button
+      document.getElementById('page-detail').dataset.product = productId;
+
+      showPage('detail');
+    }
+
+    // -------------------------------------------------------
+    // BUTTON HANDLER — prevents card click + adds ripple
+    // -------------------------------------------------------
+    function handleBtn(event, productId) {
+      event.stopPropagation(); // don't bubble to card
+      addRipple(event);
+      showDetail(productId);
+    }
+
+    // -------------------------------------------------------
+    // BUY NOW — shows toast confirmation
+    // -------------------------------------------------------
+    function handleBuy(event) {
+      addRipple(event);
+      const productId = document.getElementById('page-detail').dataset.product;
+      const name = products[productId]?.name || 'Item';
+      showToast('✅ ' + name + ' added to cart!');
+    }
+
+    // -------------------------------------------------------
+    // RIPPLE EFFECT on buttons
+    // -------------------------------------------------------
+    function addRipple(event) {
+      const btn    = event.currentTarget;
+      const circle = document.createElement('span');
+      const rect   = btn.getBoundingClientRect();
+
+      // Position the ripple where the user clicked
+      circle.className = 'ripple-effect';
+      circle.style.left = (event.clientX - rect.left - 30) + 'px';
+      circle.style.top  = (event.clientY - rect.top  - 30) + 'px';
+
+      btn.appendChild(circle);
+
+      // Remove after animation
+      setTimeout(() => circle.remove(), 600);
+    }
+
+    // -------------------------------------------------------
+    // TOAST NOTIFICATION
+    // -------------------------------------------------------
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+  </script>
+
+</body>
+</html>
